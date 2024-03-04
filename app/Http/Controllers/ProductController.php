@@ -18,13 +18,27 @@ class ProductController extends Controller
         $validatedData = $request->validate([
             'name' => 'required|max:255',
             'price' => 'required|numeric',
-            'amount' => 'required|numeric',
+            'amount' => 'required|numeric' 
         ]);
-    
+
         $product = Product::create($validatedData);
+
+        if ($request->hasFile('images')) {
+            foreach ($request->file('images') as $image) {
+                $directory = 'products/' . $product->id;
     
-        return response()->json(['message' => 'Product created successfully.', 'product' => $product], 201);
+                $path = $image->store($directory);
+    
+                $product->images()->create([
+                    'product_id' => $product->id,
+                    'url' => $path,
+                ]);
+            }
+        }
+
+        return response()->json($product);
     }
+
     public function show(Product $product)
     {
         return response()->json($product);
@@ -37,10 +51,10 @@ class ProductController extends Controller
             'price' => 'required|numeric',
             'amount' => 'required|numeric',
         ]);
-    
+
         $product->update($validatedData);
-    
-        return response()->json(['message' => 'Product updated successfully.', 'product' => $product]);
+
+        return response()->json($product);
     }
 
     public function destroy(Product $product)
