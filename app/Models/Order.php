@@ -9,11 +9,13 @@ class Order extends Model
 {
     use HasFactory;
 
-    protected $fillable = ['product_id', 'amount', 'total'];
+    protected $fillable = ['total'];
 
-    public function product()
+    public function products()
     {
-        return $this->belongsTo(Product::class);
+        return $this->belongsToMany(Product::class, 'order_products')
+                    ->withPivot('amount')
+                    ->withTimestamps();
     }
 
 }
