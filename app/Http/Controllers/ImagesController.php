@@ -4,62 +4,38 @@ namespace App\Http\Controllers;
 
 use App\Models\Images;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Storage;
 
 class ImagesController extends Controller
 {
-    /**
-     * Display a listing of the resource.
-     */
-    public function index()
+    public function upload(Request $request)
     {
-        //
+        $request->validate([
+            'image' => 'required|image|max:2048',
+        ]);
+
+        $path = $request->file('image')->store('public/images');
+
+        return response()->json([
+            'message' => 'Image uploaded successfully',
+            'path' => $path,
+        ]);
     }
 
-    /**
-     * Show the form for creating a new resource.
-     */
-    public function create()
+    public function delete($filename)
     {
-        //
-    }
+        $path = 'public/images/' . $filename;
 
-    /**
-     * Store a newly created resource in storage.
-     */
-    public function store(Request $request)
-    {
-        //
-    }
+        if (!Storage::exists($path)) {
+            return response()->json([
+                'message' => 'Image not found',
+            ], 404);
+        }
 
-    /**
-     * Display the specified resource.
-     */
-    public function show(Images $images)
-    {
-        //
-    }
+        Storage::delete($path);
 
-    /**
-     * Show the form for editing the specified resource.
-     */
-    public function edit(Images $images)
-    {
-        //
-    }
-
-    /**
-     * Update the specified resource in storage.
-     */
-    public function update(Request $request, Images $images)
-    {
-        //
-    }
-
-    /**
-     * Remove the specified resource from storage.
-     */
-    public function destroy(Images $images)
-    {
-        //
+        return response()->json([
+            'message' => 'Image deleted successfully',
+        ]);
     }
 }
