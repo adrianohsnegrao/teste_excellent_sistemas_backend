@@ -38,6 +38,8 @@ Route::group(['prefix' => 'orders'], function () {
 
     // Deletar um produto
     Route::delete('/{order}', [OrderController::class, 'destroy']);
+
+    Route::get('/{order}/products', [OrderController::class, 'showProducts']);
 });
 
 Route::group(['prefix' => 'images'], function () {

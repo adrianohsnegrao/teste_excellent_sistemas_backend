@@ -20,19 +20,19 @@ class OrderController extends Controller
             'products.*.id' => 'required|exists:products,id',
             'products.*.amount' => 'required|numeric'
         ]);
-    
+
         try {
             $order = new Order();
             $order->total = 0;
             $order->save();
-    
+
             foreach ($request->products as $product) {
                 $order->products()->attach($product['id'], ['amount' => $product['amount']]);
                 $order->total += Product::find($product['id'])->price * $product['amount'];
             }
-    
+
             $order->save();
-    
+
             return response()->json($order);
         } catch (\Exception $e) {
             return response()->json(['error' => $e->getMessage()], 500);
@@ -65,5 +65,12 @@ class OrderController extends Controller
     {
         $order->delete();
         return response()->json('Order deleted successfully');
+    }
+
+    public function showProducts(Order $order)
+    {
+        $products = $order->products()->with('images')->get();
+
+        return response()->json($products);
     }
 }
